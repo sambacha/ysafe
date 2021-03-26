@@ -1,68 +1,49 @@
-import React, { useCallback, useState } from 'react';
-import styled from 'styled-components';
-import { Button, Loader, Title } from '@gnosis.pm/safe-react-components';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
+import React from "react";
+import styled, { ThemeProvider } from "styled-components";
 
-const Container = styled.form`
-  margin-bottom: 2rem;
-  width: 100%;
-  max-width: 480px;
+import { Title } from "@gnosis.pm/safe-react-components";
 
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-column-gap: 1rem;
-  grid-row-gap: 1rem;
+import VaultsTable from "./components/VaultsTable";
+import theme from "./theme";
+
+const VaultsOuterWrapper = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  padding: 6px 24px;
+  width: calc(100% - 48px);
 `;
 
-const App: React.FC = () => {
-  const { sdk, safe } = useSafeAppsSDK();
-  const [submitting, setSubmitting] = useState(false);
+const TableWrapper = styled.div`
+  flex-grow: 1;
+`;
 
-  const submitTx = useCallback(async () => {
-    setSubmitting(true);
-    try {
-      const { safeTxHash } = await sdk.txs.send({
-        txs: [
-          {
-            to: safe.safeAddress,
-            value: '0',
-            data: '0x',
-          },
-        ],
-      });
-      console.log({ safeTxHash });
-      const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash);
-      console.log({ safeTx });
-    } catch (e) {
-      console.error(e);
-    }
-    setSubmitting(false);
-  }, [safe, sdk]);
+const TopLeftHorizontalWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+`;
 
-  return (
-    <Container>
-      <Title size="md">{safe.safeAddress}</Title>
-      {submitting ? (
-        <>
-          <Loader size="md" />
-          <br />
-          <Button
-            size="lg"
-            color="secondary"
-            onClick={() => {
-              setSubmitting(false);
-            }}
-          >
-            Cancel
-          </Button>
-        </>
-      ) : (
-        <Button size="lg" color="primary" onClick={submitTx}>
-          Submit
-        </Button>
-      )}
-    </Container>
-  );
-};
+const StyledTitle = styled(Title)`
+  margin-left: 10px;
+`;
 
-export default App;
+const SecretText = styled(StyledTitle)`
+  color: #eeeeee;
+  opacity: 0.2;
+`;
+
+const YearnApp: React.FC = () => (
+  <ThemeProvider theme={theme}>
+    <VaultsOuterWrapper>
+      <TopLeftHorizontalWrapper>
+        <img src="logo.svg" alt="YFI Logo" height="30px" />
+        <StyledTitle size="xs">Yearn Finance Vaults</StyledTitle> <SecretText size="xs">Oh my</SecretText>
+      </TopLeftHorizontalWrapper>
+      <TableWrapper>
+        <VaultsTable />
+      </TableWrapper>
+    </VaultsOuterWrapper>
+  </ThemeProvider>
+);
+
+export default YearnApp;
